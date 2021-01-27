@@ -23,11 +23,11 @@ ch_idx = indices(2);
 d = dialog('Position',[620 400 400 260],'Name','DISC Parameters');
 
 % create aesthetic panels
-rpanel = uipanel(d,'Position',[0.37 0.24 0.61 0.71]);
-llowerpanel = uipanel(d,'Position',[0.02 0.24 0.35 0.35]);
+rpanel = uipanel(d,'Position',[0.37 0.29 0.61 0.66]);
+llowerpanel = uipanel(d,'Position',[0.02 0.29 0.35 0.3]);
 
 % create button group/panel for threshold type selection
-bg_threshold = uibuttongroup(d,'Position',[0.02 0.6 0.35 0.38],'Title','Threshold Value',...
+bg_threshold = uibuttongroup(d,'Position',[0.02 0.6 0. 0.38],'Title','Threshold Value',...
     'Visible','off','SelectionChangedFcn',@thresholdSelection);
 
 % create threshold edit box and radio from selection of threshold type                         
@@ -50,36 +50,21 @@ end
 bg_threshold.Visible = 'on';                   
 
 % create viterbi iterations label and input
-uicontrol(llowerpanel,'Style','text','Position',[6 65 110 20],...
+uicontrol(llowerpanel,'Style','text','Position',[6 30 110 40],...
     'String','Viterbi Iterations','HorizontalAlignment','left');
-uicontrol(llowerpanel,'Style','edit','Position',[6 50 60 20],...
+uicontrol(llowerpanel,'Style','edit','Position',[6 10 60 20],...
     'String',disc_input.viterbi,'HorizontalAlignment','left',...
     'Callback',@edit_iterations_callback);
-
-% create k states check and edit. check is selected if previous runs had
-% any nonzero values in edit
-uicontrol(llowerpanel,'style','checkbox','string','Return k States','Position',[6 30 150 20],...
-   'Value',logical(disc_input.return_k),'callback',@check_return_k_callback);
-edit_return_k = uicontrol(llowerpanel,'style','edit','string',disc_input.return_k,'Position',[6 10 60 20],...
-    'Visible','off','HorizontalAlignment','left','callback',@edit_return_k_callback);
-% make edit visible if previous run had check selected
-if disc_input.return_k
-    edit_return_k.Visible = 'on';
-end
 
 % create BIC_GMM vs. BIC_RSS Decision Boundary label and
 % checkbox
 choicestr = sprintf("Automate Optimal Choice of\nBIC-RSS vs. BIC-GMM?");
-txt_decisionboundary = uicontrol(rpanel, 'Style','text', 'Position', [10 155 200 25],...
+txt_decisionboundary = uicontrol(rpanel, 'Style','text', 'Position', [10 145 200 25],...
                                 'String', choicestr,'HorizontalAlignment', 'left');
-checkbox_decisionboundary = uicontrol(rpanel, 'Style', 'checkbox', 'Position', [10 135 80 20],...
+checkbox_decisionboundary = uicontrol(rpanel, 'Style', 'checkbox', 'Position', [10 125 80 20],...
                                      'String', 'Automate', 'HorizontalAlignment', 'left',...
                                      'Callback', @checkbox_decisionboundary_callback);
 checkbox_decisionboundary.Value = 1;
-
-% line makes this panel easier to look at it
-txt_line = uicontrol(rpanel, 'Style', 'text', 'Position', [10 115 200 20],...
-                    'String', '--------------------------------------------------');
 
 % create slope and intercept labels and text inputs
 dbstr = sprintf("Decision Boundary Equation:\nlog10(numsamples) = slope*SNR + intercept");
@@ -88,12 +73,12 @@ txt_db = uicontrol(rpanel, 'Style', 'text', 'Position', [10 90 245 30],...
 txt_dbslope = uicontrol(rpanel, 'Style', 'text', 'Position', [10 65 100 20],...
                        'String', 'Slope', 'HorizontalAlignment', 'left');
 edit_dbslope = uicontrol(rpanel, 'Style', 'edit', 'Position', [10 50 75 20],...
-                        'String', disc_input.dbslope, 'HorizontalAlignment', 'left',...
+                        'String', p.inputParameters.dbslope, 'HorizontalAlignment', 'left',...
                         'Callback', @edit_dbslope_callback);
 txt_dbintercept = uicontrol(rpanel, 'Style', 'text', 'Position', [10 25 100 20],...
                        'String', 'Intercept', 'HorizontalAlignment', 'left');
 edit_dbintercept = uicontrol(rpanel, 'Style', 'edit', 'Position', [10 10 75 20],...
-                        'String', disc_input.dbintercept, 'HorizontalAlignment', 'left',...
+                        'String', p.inputParameters.dbintercept, 'HorizontalAlignment', 'left',...
                         'Callback', @edit_dbintercept_callback);
 % make group visible 
 txt_db.Visible = 'on';
@@ -154,7 +139,18 @@ switch disc_input.agglomerative
 end
 % and make the group invisible 
 txt_agglomerativeIC.Visible = 'off';
-popup_agglomerativeIC.Visible = 'off';
+popup_agglomerativeIC.Visible = 'off';;
+
+% create k states check and edit. check is selected if previous runs had
+% any nonzero values in edit
+uicontrol(rpanel,'style','checkbox','string','Return k States','Position',[7 35 150 20],...
+   'Value',logical(disc_input.return_k),'callback',@check_return_k_callback);
+edit_return_k = uicontrol(rpanel,'style','edit','string',disc_input.return_k,'Position',[12 12 60 20],...
+    'Visible','off','HorizontalAlignment','left','callback',@edit_return_k_callback);
+% make edit visible if previous run had check selected
+if disc_input.return_k
+    edit_return_k.Visible = 'on';
+end
 
 % create cancel and go buttons
 uicontrol('Parent',d,'Position',[65 25 100 30],'String','Cancel',...
@@ -179,42 +175,6 @@ uiwait(d);
 
     function edit_iterations_callback(H,~) % called by a custom number of iterations
         disc_input.viterbi = str2double(get(H,'string'));
-    end
-    function checkbox_decisionboundary_callback(checkbox, ~)
-        % Only want to allow user choice of OC if they
-        % choose to not automate
-        switch checkbox.Value
-            case 0
-                txt_divisiveIC.Visible = 'on';
-                popup_divisiveIC.Visible = 'on';
-                txt_agglomerativeIC.Visible = 'on';
-                popup_agglomerativeIC.Visible = 'on';
-                txt_db.Visible = 'off';
-                txt_dbslope.Visible = 'off';
-                edit_dbslope.Visible = 'off';
-                txt_dbintercept.Visible = 'off';
-                edit_dbintercept.Visible = 'off';
-                disc_input.automate = 0;
-            case 1 
-                txt_divisiveIC.Visible = 'off';
-                popup_divisiveIC.Visible = 'off';
-                txt_agglomerativeIC.Visible = 'off';
-                popup_agglomerativeIC.Visible = 'off';
-                txt_db.Visible = 'on';
-                txt_dbslope.Visible = 'on';
-                edit_dbslope.Visible = 'on';
-                txt_dbintercept.Visible = 'on';
-                edit_dbintercept.Visible = 'on';
-                disc_input.automate = 1;
-        end
-    end
-
-    function edit_dbslope_callback(H,~) % called by a custom decision boundary slope
-        disc_input.dbslope = str2double(get(H,'string'));
-    end
-
-    function edit_dbintercept_callback(H,~) % called by a custom decision boundary intercept
-        disc_input.dbintercept = str2double(get(H,'string'));
     end
 
     function popup_divisiveIC_callback(popup,~) % called by a change in divIC type
@@ -266,16 +226,8 @@ uiwait(d);
         
         % run DISC at current ROI and channel
         if ~analyze_all
-            if disc_input.automate
-                % runAutoOCDISC
-                data.rois(roi_idx, ch_idx).disc_fit =  ...
-                    runAutoOCDISC(data.rois(roi_idx, ch_idx).time_series, disc_input);
-            else
-                % runDISC
-                data.rois(roi_idx, ch_idx).disc_fit =  ...
-                    runDISC(data.rois(roi_idx, ch_idx).time_series, disc_input);
-            end
-
+            data.rois(roi_idx, ch_idx).disc_fit =  ...
+                runDISC(data.rois(roi_idx, ch_idx).time_series, disc_input);
       
         % run DISC on all ROIs at current channel
         elseif analyze_all
@@ -297,16 +249,9 @@ uiwait(d);
                     end
                     % recall waitbar and display progress
                     waitbar(ii/n_rois, f, sprintf("ROI %u of %u", ii, n_rois))
-                    if disc_input.automate
-                        % runAutoOCDISC
-                        data.rois(ii, ch_idx).disc_fit = ...
-                            runAutoOCDISC(data.rois(ii, ch_idx).time_series, disc_input);    
-                    else
-                        % runDISC
-                        data.rois(ii, ch_idx).disc_fit = ...
-                            runDISC(data.rois(ii, ch_idx).time_series, disc_input);                        
-                    end
-
+                    % run DISC
+                    data.rois(ii, ch_idx).disc_fit = ...
+                        runDISC(data.rois(ii, ch_idx).time_series, disc_input);
                 catch ME
                     delete(f); % close waitbar if error occurs
                     rethrow(ME);

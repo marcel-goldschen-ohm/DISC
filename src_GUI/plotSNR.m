@@ -1,4 +1,4 @@
-function data = computeSNR(data, ch_idx, histplot)
+function data = plotSNR(data, ch_idx, histplot)
 
 
 % find selected traces 
