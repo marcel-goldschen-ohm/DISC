@@ -56,7 +56,7 @@ end
 % converge if they do not terminate execution
 warning('off', 'stats:kmeans:FailedToConverge');
 %%  1. Signal Estimation
-n_states = unique(idealization);
+n_states = length(unique(idealization));
 %   Idealization must find more than one state
 %   in order to estimate signal
 if n_states == 1
@@ -69,7 +69,6 @@ state_transitions = sort(abs(diff(idealization)));
 state_transitions = state_transitions(state_transitions ~= 0);
 %   Binary k-Means cluster of the state transition
 %   amplitudes
-
 [~, means] = kmeans(state_transitions, 2);
 %   Signal estimate is the mean of the higher amplitude
 %   cluster
