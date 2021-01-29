@@ -95,12 +95,16 @@ txt_dbintercept = uicontrol(rpanel, 'Style', 'text', 'Position', [10 25 100 20],
 edit_dbintercept = uicontrol(rpanel, 'Style', 'edit', 'Position', [10 10 75 20],...
                         'String', disc_input.dbintercept, 'HorizontalAlignment', 'left',...
                         'Callback', @edit_dbintercept_callback);
+push_dbdefaults = uicontrol(rpanel, 'Style', 'pushbutton', 'Position', [120 30 75 20],...
+                            'String', 'Use Defaults', 'HorizontalAlignment', 'left',...
+                            'Callback', @push_dbdefaults_callback);
 % make group visible 
 txt_db.Visible = 'on';
 txt_dbslope.Visible = 'on';
 edit_dbslope.Visible = 'on';
 txt_dbintercept.Visible = 'on';
 edit_dbintercept.Visible = 'on';
+push_dbdefaults.Visible = 'on';
 
 % create divisive IC label and popup                 
 txt_divisiveIC = uicontrol(rpanel,'Style','text','Position',[10 90 100 20],...
@@ -194,6 +198,7 @@ uiwait(d);
                 edit_dbslope.Visible = 'off';
                 txt_dbintercept.Visible = 'off';
                 edit_dbintercept.Visible = 'off';
+                push_dbdefaults.Visible = 'off';
                 disc_input.automate = 0;
             case 1 
                 txt_divisiveIC.Visible = 'off';
@@ -205,6 +210,7 @@ uiwait(d);
                 edit_dbslope.Visible = 'on';
                 txt_dbintercept.Visible = 'on';
                 edit_dbintercept.Visible = 'on';
+                push_dbdefaults.Visible = 'on';
                 disc_input.automate = 1;
         end
     end
@@ -215,6 +221,13 @@ uiwait(d);
 
     function edit_dbintercept_callback(H,~) % called by a custom decision boundary intercept
         disc_input.dbintercept = str2double(get(H,'string'));
+    end
+
+    function push_dbdefaults_callback(~,~) % called by pushing default button 
+        disc_input.dbslope = -0.74;
+        disc_input.dbintercept = 5.8;
+        edit_dbslope.String = num2str(disc_input.dbslope);
+        edit_dbintercept.String = num2str(disc_input.dbintercept);
     end
 
     function popup_divisiveIC_callback(popup,~) % called by a change in divIC type
@@ -269,7 +282,7 @@ uiwait(d);
             if disc_input.automate
                 % runAutoOCDISC
                 data.rois(roi_idx, ch_idx).disc_fit =  ...
-                    runAutoOCDISC(data.rois(roi_idx, ch_idx).time_series, disc_input);
+                    runAutoDISC(data.rois(roi_idx, ch_idx).time_series, disc_input);
             else
                 % runDISC
                 data.rois(roi_idx, ch_idx).disc_fit =  ...
@@ -300,7 +313,7 @@ uiwait(d);
                     if disc_input.automate
                         % runAutoOCDISC
                         data.rois(ii, ch_idx).disc_fit = ...
-                            runAutoOCDISC(data.rois(ii, ch_idx).time_series, disc_input);    
+                            runAutoDISC(data.rois(ii, ch_idx).time_series, disc_input);    
                     else
                         % runDISC
                         data.rois(ii, ch_idx).disc_fit = ...
