@@ -6,10 +6,13 @@ DISC is an open source MATLAB package for time series idealization (i.e. identif
 
 White, D., Goldschen-Ohm, M., Goldsmith, R. & Chanda, B. High-Throughput Single-Molecule Analysis via Divisive Segmentation and Clustering. bioRxiv, 603761 (2019).
 
+## Automated data-driven criterion selection for optimal idealization
+
+An advancement on the original DISC algorithm is the automated choice of objective criterion based on properties of the input time series. To use this feature, simply check the automated selection box in the dialog that is presented upon clicking the Analyze button in the DISCO GUI (see below). To use this feature from the command line, use the function runAutoDISC().
 
 ## DISCO
 
-DISCO is the graphical user interface (GUI) for DISC. We aimed to make DISCO as user friendly as possible and welcome feedback on how we can improve. Please see the provided docs/Manual.md for full instructions. As DISCO gains more use, we can make other requested features available (i.e. dwell time analysis, automated trace selection, etc...). All updates will be made available on https://github.com/ChandaLab/DISC pending manuscript acceptance. Stay tuned!
+DISCO is the graphical user interface (GUI) for DISC. We aimed to make DISCO as user friendly as possible and welcome feedback on how we can improve. Please see the provided docs/Manual.md for full instructions. As DISCO gains more use, we can make other requested features available (i.e. dwell time analysis, automated trace selection, etc...).
 
 ## New in 2.0
 1. Histograms of SNR and number of identified states
